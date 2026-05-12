@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "login:x": "node scripts/run-login.js",
+    "crawl:test": "node scripts/run-crawl-test.js"
+
   },
   "keywords": [],
   "author": "",
@@ -15,6 +18,7 @@
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "mongoose": "^9.6.1"
+    "mongoose": "^9.6.1",
+    "puppeteer-core": "^24.43.1"
   }
 }
