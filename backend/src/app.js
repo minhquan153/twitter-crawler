@@ -5,6 +5,8 @@ const sourceRoutes = require("./routes/source.routes");
 const crawlRoutes = require("./routes/crawl.routes");
 const statsRoutes = require("./routes/stats.routes");
 const crawlRunRoutes = require("./routes/crawlRun.routes");
+const { notFound, errorHandler } = require("./middleware/errorHandler");
+
 
 const app = express();
 
@@ -16,5 +18,8 @@ app.use("/api/sources", sourceRoutes);
 app.use("/api/crawl", crawlRoutes);
 app.use("/api/stats", statsRoutes);
 app.use("/api/crawl-runs", crawlRunRoutes);
+
+app.use(notFound);
+app.use(errorHandler);
 
 module.exports = app;
