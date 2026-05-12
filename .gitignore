@@ -1,0 +1,19 @@
+node_modules/
+.env
+.env.*
+
+# Chrome / browser profiles
+chrome-profile/
+chrome-profiles/
+chromium-profile/
+browser-profile/
+profiles/
+user-data-dir/
+
+# Export files
+exports/
+export/
+*.csv
+*.xlsx
+*.jsonl
+*.ndjson
