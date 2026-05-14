@@ -19,11 +19,12 @@ async function scrollPageForTweets(page, options = {}) {
       break;
     }
 
-    previousTweetCount = currentTweetCount;
+    const scrollScreens = options.scrollScreens ?? 3;
 
-    await page.evaluate(() => {
-      window.scrollBy(0, window.innerHeight);
-    });
+    await page.evaluate((scrollScreens) => {
+      window.scrollBy(0, window.innerHeight * scrollScreens);
+    }, scrollScreens);
+
 
     await new Promise((resolve) => setTimeout(resolve, 1500));
   }
