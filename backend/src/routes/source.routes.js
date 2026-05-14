@@ -19,6 +19,13 @@ router.post(
   sourceController.createSource
 );
 
+router.post(
+  "/:id/run",
+  adminAuth,
+  validateObjectId,
+  sourceController.runSourceNow
+);
+
 router.patch(
   "/:id",
   adminAuth,

@@ -1,4 +1,5 @@
 const sourceService = require("../services/source.service");
+const crawlService = require("../services/crawl.service");
 
 async function listSources(req, res) {
   const result = await sourceService.listSources();
@@ -36,9 +37,27 @@ async function removeSource(req, res) {
   });
 }
 
+async function runSourceNow(req, res, next) {
+  try {
+    const result = await crawlService.runSourceCrawl(req.params.id);
+
+    res.json({
+      message: result.skipped ? "Source skipped" : "Source crawled",
+      data: result,
+    });
+  } catch (error) {
+    if (error.message === "Crawl source not found"){
+      return res.status(404).json({ message: "Source not found" });
+    }
+
+    next(error);
+  }
+}
+
 module.exports = {
   listSources,
   createSource,
   updateSource,
   removeSource,
+  runSourceNow,
 };

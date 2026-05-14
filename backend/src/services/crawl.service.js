@@ -4,13 +4,16 @@ const { scrollPageForTweets } = require("../crawler/scroll");
 const { extractTweetsFromPage } = require("../crawler/extractTweets");
 const tweetService = require("./tweet.service");
 const crawlRunService = require("./crawlRun.service");
+const CrawlSource = require("../models/crawlSource.model");
 
-async function crawlXUrl(rawUrl) {
+
+async function crawlXUrl(rawUrl, options = {}) {
   const targetUrl = normalizeTargetUrl(rawUrl);
 
   const crawlRun = await crawlRunService.startCrawlRun({
     url: targetUrl,
-    runType: "manual",
+    runType: options.runType || "manual",
+    sourceId: options.sourceId || null,
   });
 
   let browser;
@@ -64,6 +67,63 @@ async function crawlXUrl(rawUrl) {
   }
 }
 
+async function runSourceCrawl(sourceOrId) {
+  const source = typeof sourceOrId === "object"
+    ? sourceOrId
+    : await CrawlSource.findById(sourceOrId).lean();
+
+    if(!source){
+      throw new Error("Crawl source not found");
+    }
+
+    if(!source.enabled){
+      return {
+        skipped: true,
+        reason: "Source is disabled",
+      }
+    }
+
+    const now = new Date();
+
+    await CrawlSource.findByIdAndUpdate(source._id, {
+      lastStatus: "running",
+      lastError: null,
+    });
+
+    try{
+      const result = await crawlXUrl(source.url, {
+        runType: "auto",
+        sourceId: source._id,
+      });
+      const nextRunAt = new Date(
+        Date.now() + source.intervalMinutes * 60 * 1000
+      );
+
+      await CrawlSource.findByIdAndUpdate(source._id, {
+        lastStatus: "success",
+        lastCrawledAt: now,
+        nextRunAt,
+        lastResult: result,
+        lastError: null,
+      });
+
+      return result;
+    } catch (error) {
+      const nextRunAt = new Date(
+        Date.now() + source.intervalMinutes * 60 * 1000
+      );
+      await CrawlSource.findByIdAndUpdate(source._id, {
+        lastStatus: "error",
+        lastCrawledAt: now,
+        nextRunAt,
+        lastError: error.message,
+      });
+
+      throw error;
+    }
+}
+
 module.exports = {
   crawlXUrl,
+  runSourceCrawl,
 };

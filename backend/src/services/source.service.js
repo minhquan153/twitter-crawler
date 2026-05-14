@@ -143,6 +143,15 @@ async function deleteSource(id) {
   return deletedSource;
 }
 
+async function getDueSources() {
+  return CrawlSource.find({
+    enabled: true,
+    nextRunAt: { $lte: new Date() },
+    lastStatus: { $ne: "running" },
+  })
+    .sort({ nextRunAt: 1 })
+    .lean();
+}
 
 module.exports = {
   normalizeSourceUrl,
@@ -150,4 +159,5 @@ module.exports = {
   createSource,
   updateSource,
   deleteSource,
+  getDueSources,
 };

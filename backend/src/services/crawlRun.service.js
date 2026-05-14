@@ -37,8 +37,44 @@ async function finishCrawlRunError(id, error) {
   ).lean();
 }
 
+async function listRuns(query = {}) {
+  const page = Math.max(Number(query.page) || 1, 1);
+  const limit = Math.min(Math.max(Number(query.limit) || 10, 1), 100);
+
+  const filter = {};
+
+  if (query.status) {
+    filter.status = query.status;
+  }
+
+  if (query.sourceId) {
+    filter.sourceId = query.sourceId;
+  }
+
+  if (query.runType) {
+    filter.runType = query.runType;
+  }
+
+  const total = await CrawlRun.countDocuments(filter);
+  const data = await CrawlRun.find(filter)
+    .sort({ startedAt: -1 })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .lean();
+
+  return {
+    data,
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit),
+  };
+
+}
+
 module.exports = {
   startCrawlRun,
   finishCrawlRunSuccess,
   finishCrawlRunError,
+  listRuns,
 };

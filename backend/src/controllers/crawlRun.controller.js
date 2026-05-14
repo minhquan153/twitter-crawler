@@ -1,5 +1,12 @@
-function listCrawlRuns(req, res) {
-  res.json({ message: "OK", module: "crawl-runs" });
+const crawlRunService = require("../services/crawlRun.service");
+
+async function listCrawlRuns(req, res, next) {
+  try {
+    const result = await crawlRunService.listRuns(req.query);
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
 }
 
 module.exports = {
