@@ -1,5 +1,12 @@
-function getOverview(req, res) {
-  res.json({ message: "OK", module: "stats" });
+const statsService = require("../services/stats.service");
+
+async function getOverview(req, res, next) {
+  try {
+    const result = await statsService.getOverview();
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
 }
 
 module.exports = {
