@@ -21,7 +21,7 @@ async function finishCrawlRunSuccess(id, result) {
       matched: result.matched,
       modified: result.modified,
     },
-    { new: true }
+    { returnDocument: "after" }
   ).lean();
 }
 
@@ -33,7 +33,7 @@ async function finishCrawlRunError(id, error) {
       finishedAt: new Date(),
       error: error.message,
     },
-    { new: true }
+    { returnDocument: "after" }
   ).lean();
 }
 
@@ -69,7 +69,6 @@ async function listRuns(query = {}) {
     limit,
     totalPages: Math.ceil(total / limit),
   };
-
 }
 
 module.exports = {

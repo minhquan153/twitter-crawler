@@ -98,6 +98,7 @@ async function createSource(input = {}) {
 
 async function updateSource(id, input = {}) {
   const update = {};
+  let nextIntervalMinutes = null;
 
   if (input.url !== undefined) {
     update.url = normalizeSourceUrl(input.url);
@@ -111,6 +112,7 @@ async function updateSource(id, input = {}) {
     }
 
     update.intervalMinutes = intervalMinutes;
+    nextIntervalMinutes = intervalMinutes;
   }
 
   if (input.enabled !== undefined) {
@@ -121,11 +123,27 @@ async function updateSource(id, input = {}) {
     update.enabled = input.enabled;
   }
 
+  if (input.enabled === true) {
+    if (nextIntervalMinutes === null) {
+      const source = await CrawlSource.findById(id).select("intervalMinutes").lean();
+
+      if (!source) {
+        return null;
+      }
+
+      nextIntervalMinutes = source.intervalMinutes;
+    }
+
+    update.nextRunAt = new Date(
+      Date.now() + nextIntervalMinutes * 60 * 1000
+    );
+  }
+
   const updatedSource = await CrawlSource.findByIdAndUpdate(
     id,
     update,
     {
-      new: true,
+      returnDocument: "after",
       runValidators: true,
     }
   ).lean();
