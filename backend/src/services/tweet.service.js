@@ -101,6 +101,33 @@ function escapeRegex(value = "") {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+function normalizeSort(value) {
+  const allowedSorts = new Set([
+    "latest",
+    "oldest",
+    "recentlyCrawled",
+    "oldestCrawled",
+  ]);
+
+  return allowedSorts.has(value) ? value : "latest";
+}
+
+function getSortOption(sort) {
+  if (sort === "oldest") {
+    return { postedAt: 1, createdAt: 1 };
+  }
+
+  if (sort === "recentlyCrawled") {
+    return { updatedAt: -1, createdAt: -1 };
+  }
+
+  if (sort === "oldestCrawled") {
+    return { updatedAt: 1, createdAt: 1 };
+  }
+
+  return { postedAt: -1, createdAt: -1 };
+}
+
 async function getTweets(query = {}) {
   const page = Math.max(Number(query.page) || 1, 1);
   const limit = Math.min(Math.max(Number(query.limit) || 10, 1), 100);
@@ -108,7 +135,7 @@ async function getTweets(query = {}) {
   const search = query.search?.trim();
   const handle = query.handle?.trim();
   const sourceUrl = query.sourceUrl?.trim();
-  const sort = query.sort === "oldest" ? "oldest" : "latest";
+  const sort = normalizeSort(query.sort);
 
   const filter = {};
 
@@ -142,10 +169,7 @@ async function getTweets(query = {}) {
     }
   }
 
-  const sortOption =
-    sort === "oldest"
-      ? { postedAt: 1, createdAt: 1 }
-      : { postedAt: -1, createdAt: -1 };
+  const sortOption = getSortOption(sort);
 
   const total = await Tweet.countDocuments(filter);
 
@@ -196,7 +220,6 @@ async function deleteTweet(id) {
 
   return deletedTweet;
 }
-
 
 module.exports = {
   getTweets,
