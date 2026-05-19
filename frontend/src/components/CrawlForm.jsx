@@ -1,22 +1,22 @@
 import { useState } from "react";
 import { crawlX } from "../api/crawl.api";
+import CollapsibleSection from "./CollapsibleSection";
 
 const DEFAULT_URL = "https://x.com/home";
 
 function CrawlForm({ onSuccess }) {
   const [url, setUrl] = useState(DEFAULT_URL);
-  const [showCustomUrl, setShowCustomUrl] = useState(false);
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState(null);
   const [error, setError] = useState("");
 
-  async function runCrawl(targetUrl) {
+  async function runCrawl() {
     setLoading(true);
     setError("");
     setSummary(null);
 
     try {
-      const result = await crawlX(targetUrl);
+      const result = await crawlX(url);
       setSummary(result.data);
 
       if (onSuccess) {
@@ -32,45 +32,30 @@ function CrawlForm({ onSuccess }) {
     }
   }
 
-  function handleCrawl() {
-    runCrawl(url);
-  }
-
   return (
-    <section className="crawl-form">
-      <div className="crawl-header">
-        <div>
-          <h2>Manual Crawl</h2>
-          <p>Run a manual crawl from your X session.</p>
-        </div>
+    <CollapsibleSection
+      title="Crawl Link"
+      summary={url}
+      className="manual-crawl"
+      actions={
+        <button type="button" onClick={runCrawl} disabled={loading}>
+          {loading ? "Crawling..." : "Crawl X"}
+        </button>
+      }
+    >
+      <p className="section-note">Run a manual crawl from your X session.</p>
 
-        <div className="crawl-actions">
-          <button type="button" onClick={handleCrawl} disabled={loading}>
-            {loading ? "Crawling..." : "Crawl X"}
-          </button>
-
-          <button
-            type="button"
-            className="link-button"
-            onClick={() => setShowCustomUrl((value) => !value)}
-          >
-            {showCustomUrl ? "Hide custom source" : "Custom source"}
-          </button>
-
-          {showCustomUrl && (
-            <div className="crawl-row">
-              <input
-                type="url"
-                value={url}
-                onChange={(event) => setUrl(event.target.value)}
-                placeholder="https://x.com/home"
-                disabled={loading}
-                required
-              />
-            </div>
-          )}
-        </div>
-      </div>
+      <label className="crawl-field">
+        <span>Custom source</span>
+        <input
+          type="url"
+          value={url}
+          onChange={(event) => setUrl(event.target.value)}
+          placeholder="https://x.com/home"
+          disabled={loading}
+          required
+        />
+      </label>
 
       {error && <p className="error-message">{error}</p>}
 
@@ -82,7 +67,7 @@ function CrawlForm({ onSuccess }) {
           <span>Modified: {summary.modified}</span>
         </div>
       )}
-    </section>
+    </CollapsibleSection>
   );
 }
 
