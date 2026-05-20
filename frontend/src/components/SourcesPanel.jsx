@@ -44,6 +44,10 @@ function formatNextRun(source) {
   return formatDate(source.nextRunAt);
 }
 
+function hasLastResult(source) {
+  return Boolean(source.lastResult);
+}
+
 function SourcesPanel({ refreshKey = 0, onChange }) {
   const [sources, setSources] = useState([]);
   const [url, setUrl] = useState("");
@@ -229,6 +233,7 @@ function SourcesPanel({ refreshKey = 0, onChange }) {
         {sources.map((source) => {
           const busy = actionId === source._id;
           const editingInterval = editingIntervalId === source._id;
+          const lastResult = source.lastResult;
 
           return (
             <details className="source-card" key={source._id}>
@@ -259,6 +264,18 @@ function SourcesPanel({ refreshKey = 0, onChange }) {
                     <dd>{source.lastError || "None"}</dd>
                   </div>
                 </dl>
+
+                {hasLastResult(source) && (
+                  <div className="source-result">
+                    <span>Last result</span>
+                    <div className="crawl-summary">
+                      <span>Crawled: {lastResult.crawled ?? 0}</span>
+                      <span>Inserted: {lastResult.inserted ?? 0}</span>
+                      <span>Matched: {lastResult.matched ?? 0}</span>
+                      <span>Modified: {lastResult.modified ?? 0}</span>
+                    </div>
+                  </div>
+                )}
 
                 <div className="source-actions">
                   <div className="source-interval">

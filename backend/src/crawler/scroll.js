@@ -1,35 +1,42 @@
-async function scrollPageForTweets(page, options = {}) {
+const { extractTweetsFromPage } = require("./extractTweets");
+
+async function collectTweetsWhileScrolling(page, sourceUrl, options = {}) {
   const maxScrolls = options.maxScrolls ?? 10;
-  let previousTweetCount = 0;
+  const scrollScreens = options.scrollScreens ?? 3;
+  const delayMs = options.delayMs ?? 1500;
+  const maxStableRounds = options.maxStableRounds ?? 5;
+
+  const tweetMap = new Map();
   let stableRounds = 0;
 
   for (let i = 0; i < maxScrolls; i += 1) {
-    const currentTweetCount = await page.$$eval(
-      "article[data-testid='tweet']",
-      (articles) => articles.length
-    );
+    const currentTweets = await extractTweetsFromPage(page, sourceUrl);
+    const previousSize = tweetMap.size;
 
-    if (currentTweetCount <= previousTweetCount) {
+    for (const tweet of currentTweets) {
+      tweetMap.set(tweet.tweetId, tweet);
+    }
+
+    if (tweetMap.size === previousSize) {
       stableRounds += 1;
     } else {
       stableRounds = 0;
     }
 
-    if (stableRounds >= 2) {
+    if (stableRounds >= maxStableRounds) {
       break;
     }
-
-    const scrollScreens = options.scrollScreens ?? 3;
 
     await page.evaluate((scrollScreens) => {
       window.scrollBy(0, window.innerHeight * scrollScreens);
     }, scrollScreens);
 
-
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await new Promise((resolve) => setTimeout(resolve, delayMs));
   }
+
+  return Array.from(tweetMap.values());
 }
 
 module.exports = {
-  scrollPageForTweets,
+  collectTweetsWhileScrolling,
 };

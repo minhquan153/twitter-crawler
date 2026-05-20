@@ -1,7 +1,6 @@
 const { launchBrowser } = require("../crawler/browser");
 const { normalizeTargetUrl } = require("../utils/normalizeTargetUrl");
-const { scrollPageForTweets } = require("../crawler/scroll");
-const { extractTweetsFromPage } = require("../crawler/extractTweets");
+const { collectTweetsWhileScrolling } = require("../crawler/scroll");
 const tweetService = require("./tweet.service");
 const crawlRunService = require("./crawlRun.service");
 const CrawlSource = require("../models/crawlSource.model");
@@ -31,9 +30,9 @@ async function crawlXUrl(rawUrl, options = {}) {
       timeout: 30000,
     });
 
-    await scrollPageForTweets(page, { maxScrolls: 10 });
-
-    const tweets = await extractTweetsFromPage(page, targetUrl);
+    const tweets = await collectTweetsWhileScrolling(page, targetUrl, {
+      maxScrolls: 10,
+    });
     const saveResult = await tweetService.saveTweets(tweets);
 
     const result = {

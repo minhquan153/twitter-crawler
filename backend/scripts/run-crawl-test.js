@@ -2,8 +2,7 @@ require("dotenv").config();
 
 const { launchBrowser } = require("../src/crawler/browser");
 const { normalizeTargetUrl } = require("../src/utils/normalizeTargetUrl");
-const { scrollPageForTweets } = require("../src/crawler/scroll");
-const { extractTweetsFromPage } = require("../src/crawler/extractTweets");
+const { collectTweetsWhileScrolling } = require("../src/crawler/scroll");
 
 
 
@@ -19,9 +18,9 @@ async function main() {
       timeout: 30000,
     });
 
-    await scrollPageForTweets(page, { maxScrolls: 10 });
-
-    const tweets = await extractTweetsFromPage(page, targetUrl);
+    const tweets = await collectTweetsWhileScrolling(page, targetUrl, {
+      maxScrolls: 10,
+    });
     console.log(tweets);
     
 

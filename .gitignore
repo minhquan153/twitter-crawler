@@ -2,13 +2,35 @@ node_modules/
 .env
 .env.*
 
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build / cache output
+dist/
+build/
+coverage/
+.vite/
+
 # Chrome / browser profiles
+backend/puppeteer-data/
+puppeteer-data/
 chrome-profile/
 chrome-profiles/
 chromium-profile/
 browser-profile/
 profiles/
 user-data-dir/
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
 
 # Export files
 exports/
@@ -17,3 +39,6 @@ export/
 *.xlsx
 *.jsonl
 *.ndjson
+
+# Local project notes
+PROJECT_OVERVIEW.md

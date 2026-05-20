@@ -315,6 +315,16 @@ select:disabled {
   padding: 0 14px 14px;
 }
 
+.source-result {
+  display: grid;
+  gap: 8px;
+}
+
+.source-result > span {
+  color: var(--text);
+  font-weight: 700;
+}
+
 .tweet-card-header h3,
 .tweet-card-header p,
 .source-card h3 {
@@ -360,6 +370,41 @@ select:disabled {
   align-items: center;
   justify-content: center;
   gap: 12px;
+}
+
+.crawl-run-pagination {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.crawl-run-pagination button {
+  min-width: 42px;
+  padding: 8px 10px;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.crawl-run-pagination button.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.page-number-list {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+
+.page-gap {
+  display: inline-grid;
+  min-width: 24px;
+  place-items: center;
+  color: var(--text);
 }
 
 .source-create-form {
@@ -578,7 +623,7 @@ select:disabled {
 
 .crawl-run-meta {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 10px;
   margin: 0;
 }
@@ -648,6 +693,14 @@ select:disabled {
 
   .collapsible-actions button,
   .secondary-action {
+    width: 100%;
+  }
+
+  .crawl-run-pagination {
+    grid-template-columns: 1fr;
+  }
+
+  .crawl-run-pagination button {
     width: 100%;
   }
 }
