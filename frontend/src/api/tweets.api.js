@@ -27,3 +27,19 @@ export function deleteTweet(id) {
     admin: true,
   });
 }
+
+export function deleteTweets(ids) {
+  return request("/tweets/delete-many", {
+    method: "POST",
+    admin: true,
+    body: { ids },
+  });
+}
+
+export function deleteAllTweets(filters = {}) {
+  return request("/tweets/delete-all", {
+    method: "POST",
+    admin: true,
+    body: filters,
+  });
+}

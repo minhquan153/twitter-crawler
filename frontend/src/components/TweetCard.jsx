@@ -12,13 +12,24 @@ function formatDate(value) {
   return date.toLocaleString();
 }
 
-function TweetCard({ tweet, onDelete }) {
+function TweetCard({ tweet, onDelete, selected = false, onSelectChange }) {
   return (
     <article className="tweet-card">
       <div className="tweet-card-header">
-        <div>
-          <h3>{tweet.name || "Unknown author"}</h3>
-          <p>{tweet.handle || "No handle"}</p>
+        <div className="tweet-card-title">
+          <label className="tweet-select">
+            <input
+              type="checkbox"
+              checked={selected}
+              onChange={(event) => onSelectChange(tweet._id, event.target.checked)}
+            />
+            <span>Select tweet</span>
+          </label>
+
+          <div>
+            <h3>{tweet.name || "Unknown author"}</h3>
+            <p>{tweet.handle || "No handle"}</p>
+          </div>
         </div>
 
         <button type="button" onClick={() => onDelete(tweet._id)}>

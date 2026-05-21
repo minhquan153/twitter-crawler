@@ -331,6 +331,31 @@ select:disabled {
   margin: 0;
 }
 
+.tweet-card-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.tweet-select,
+.tweet-select-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+  font-size: 14px;
+}
+
+.tweet-select {
+  padding-top: 3px;
+}
+
+.tweet-selection-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .tweet-content {
   white-space: pre-wrap;
 }
@@ -557,6 +582,7 @@ select:disabled {
 }
 
 .stats-panel,
+.crypto-report,
 .crawl-history,
 .import-export-panel {
   display: grid;
@@ -672,6 +698,56 @@ select:disabled {
 
 .success-message {
   color: #15803d;
+}
+
+.report-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.report-table {
+  width: 100%;
+  min-width: 820px;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.report-table th,
+.report-table td {
+  border-bottom: 1px solid var(--border);
+  padding: 10px 12px;
+  white-space: nowrap;
+}
+
+.report-table th {
+  color: var(--text-h);
+  font-size: 14px;
+}
+
+.sentiment-badge {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 3px 8px;
+  font-size: 13px;
+  text-transform: capitalize;
+}
+
+.sentiment-badge.positive {
+  color: #15803d;
+  border-color: #86efac;
+  background: #f0fdf4;
+}
+
+.sentiment-badge.negative {
+  color: #b91c1c;
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+
+.sentiment-badge.neutral {
+  color: #0369a1;
+  border-color: #bae6fd;
+  background: #f0f9ff;
 }
 
 @media (max-width: 760px) {

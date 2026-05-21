@@ -40,6 +40,38 @@ const tweetSchema = new mongoose.Schema(
       index: true,
       trim: true,
     },
+    coins: {
+      type: [String],
+      default: [],
+      index: true,
+    },
+    pairs: {
+      type: [String],
+      default: [],
+      index: true,
+    },
+    sentiment: {
+      type: String,
+      enum: ["positive", "negative", "neutral", "unknown"],
+      default: "unknown",
+      index: true,
+    },
+    sentimentScore: {
+      type: Number,
+      default: 0,
+    },
+    confidence: {
+      type: Number,
+      default: 0,
+    },
+    analyzedAt: {
+      type: Date,
+    },
+    hotScore: {
+      type: Number,
+      default: 0,
+      index: true,
+    },
   },
   {
     timestamps: true,

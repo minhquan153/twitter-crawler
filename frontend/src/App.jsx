@@ -2,6 +2,7 @@ import { useState } from "react";
 import "./App.css";
 import CrawlForm from "./components/CrawlForm";
 import CrawlRunHistory from "./components/CrawlRunHistory";
+import CryptoReport from "./components/CryptoReport";
 import ImportExportPanel from "./components/ImportExportPanel";
 import SourcesPanel from "./components/SourcesPanel";
 import StatsCards from "./components/StatsCards";
@@ -30,6 +31,7 @@ function App() {
                 </button>
               </div>
               <StatsCards refreshKey={dashboardRefreshKey} />
+              <CryptoReport refreshKey={dashboardRefreshKey} />
               <CrawlRunHistory refreshKey={dashboardRefreshKey} />
             </>
           }

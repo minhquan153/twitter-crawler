@@ -1,3 +1,5 @@
+const mongoose = require("mongoose");
+
 function getImportTweets(payload) {
   return Array.isArray(payload) ? payload : payload?.data;
 }
@@ -51,8 +53,58 @@ function validateImportTweetsBody(body = {}) {
   return errors;
 }
 
+function validateDeleteManyTweetsBody(body = {}) {
+  const errors = [];
+  const ids = body?.ids;
+
+  if (!Array.isArray(ids) || ids.length === 0) {
+    errors.push({
+      field: "ids",
+      message: "ids must be a non-empty array",
+    });
+
+    return errors;
+  }
+
+  ids.forEach((id, index) => {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      errors.push({
+        field: `ids[${index}]`,
+        message: "id must be a valid ObjectId",
+      });
+    }
+  });
+
+  return errors;
+}
+
+function validateDeleteAllTweetsBody(body = {}) {
+  const errors = [];
+
+  for (const field of ["search", "handle", "sourceUrl", "fromDate", "toDate"]) {
+    if (
+      body[field] !== undefined &&
+      body[field] !== null &&
+      typeof body[field] !== "string"
+    ) {
+      errors.push({
+        field,
+        message: `${field} must be a string`,
+      });
+    }
+  }
+
+  return errors;
+}
+
 module.exports = {
   importTweetsSchema: {
     body: validateImportTweetsBody,
+  },
+  deleteManyTweetsSchema: {
+    body: validateDeleteManyTweetsBody,
+  },
+  deleteAllTweetsSchema: {
+    body: validateDeleteAllTweetsBody,
   },
 };

@@ -3,7 +3,11 @@ const tweetController = require("../controllers/tweet.controller");
 const adminAuth = require("../middleware/adminAuth");
 const validateObjectId = require("../middleware/validateObjectId");
 const validateRequest = require("../middleware/validateRequest");
-const { importTweetsSchema } = require("../middleware/tweet.validator");
+const {
+  deleteAllTweetsSchema,
+  deleteManyTweetsSchema,
+  importTweetsSchema,
+} = require("../middleware/tweet.validator");
 
 const router = express.Router();
 
@@ -14,6 +18,20 @@ router.post(
   adminAuth,
   validateRequest(importTweetsSchema),
   tweetController.importTweetData
+);
+
+router.post(
+  "/delete-many",
+  adminAuth,
+  validateRequest(deleteManyTweetsSchema),
+  tweetController.removeTweets
+);
+
+router.post(
+  "/delete-all",
+  adminAuth,
+  validateRequest(deleteAllTweetsSchema),
+  tweetController.removeAllTweets
 );
 
 router.delete(

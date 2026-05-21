@@ -5,6 +5,7 @@ const sourceRoutes = require("./routes/source.routes");
 const crawlRoutes = require("./routes/crawl.routes");
 const statsRoutes = require("./routes/stats.routes");
 const crawlRunRoutes = require("./routes/crawlRun.routes");
+const cryptoReportRoutes = require("./routes/cryptoReport.routes");
 const { notFound, errorHandler } = require("./middleware/errorHandler");
 
 
@@ -18,6 +19,7 @@ app.use("/api/sources", sourceRoutes);
 app.use("/api/crawl", crawlRoutes);
 app.use("/api/stats", statsRoutes);
 app.use("/api/crawl-runs", crawlRunRoutes);
+app.use("/api/crypto-report", cryptoReportRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

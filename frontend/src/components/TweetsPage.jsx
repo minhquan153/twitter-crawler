@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
-import { deleteTweet, listTweets } from "../api/tweets.api";
+import {
+  deleteAllTweets,
+  deleteTweet,
+  deleteTweets,
+  listTweets,
+} from "../api/tweets.api";
 import Pagination from "./Pagination";
 import TweetList from "./TweetList";
 import TweetToolbar from "./TweetToolBar";
@@ -31,6 +36,7 @@ function TweetsPage({
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [selectedIds, setSelectedIds] = useState(() => new Set());
 
   const loadTweets = useCallback(async () => {
     const params = {
@@ -65,11 +71,107 @@ function TweetsPage({
   function handleFilterChange(nextFilters) {
     setFilters(nextFilters);
     setPage(1);
+    setSelectedIds(new Set());
   }
 
   function handleClearFilters() {
     setFilters(DEFAULT_FILTERS);
     setPage(1);
+    setSelectedIds(new Set());
+  }
+
+  function handleSelectTweet(id, checked) {
+    setSelectedIds((currentIds) => {
+      const nextIds = new Set(currentIds);
+
+      if (checked) {
+        nextIds.add(id);
+      } else {
+        nextIds.delete(id);
+      }
+
+      return nextIds;
+    });
+  }
+
+  function handleSelectCurrentPage(checked) {
+    setSelectedIds((currentIds) => {
+      const nextIds = new Set(currentIds);
+
+      for (const tweet of result.data) {
+        if (checked) {
+          nextIds.add(tweet._id);
+        } else {
+          nextIds.delete(tweet._id);
+        }
+      }
+
+      return nextIds;
+    });
+  }
+
+  async function handleDeleteSelected() {
+    const ids = [...selectedIds];
+    const confirmed = window.confirm(`Delete ${ids.length} selected tweets?`);
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await deleteTweets(ids);
+      setSelectedIds(new Set());
+
+      if (result.data.length <= ids.length && page > 1) {
+        setPage((value) => value - 1);
+      } else {
+        loadTweets();
+      }
+
+      if (onDataChange) {
+        onDataChange();
+      }
+    } catch (error) {
+      setError(error.message);
+    }
+  }
+
+  function getActiveDeleteFilters() {
+    const activeFilters = {};
+
+    for (const key of ["search", "handle", "sourceUrl", "fromDate", "toDate"]) {
+      if (filters[key]) {
+        activeFilters[key] = filters[key];
+      }
+    }
+
+    return activeFilters;
+  }
+
+  async function handleDeleteAll() {
+    const activeFilters = getActiveDeleteFilters();
+    const hasFilters = Object.keys(activeFilters).length > 0;
+    const targetText = hasFilters
+      ? `${result.total} tweets matching current filters`
+      : `all ${result.total} saved tweets`;
+    const confirmed = window.confirm(`Delete ${targetText}?`);
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await deleteAllTweets(activeFilters);
+      setSelectedIds(new Set());
+      setPage(1);
+      loadTweets();
+
+      if (onDataChange) {
+        onDataChange();
+      }
+    } catch (error) {
+      setError(error.message);
+    }
   }
 
   async function handleDeleteTweet(id) {
@@ -88,6 +190,12 @@ function TweetsPage({
         loadTweets();
       }
 
+      setSelectedIds((currentIds) => {
+        const nextIds = new Set(currentIds);
+        nextIds.delete(id);
+        return nextIds;
+      });
+
       if (onDataChange) {
         onDataChange();
       }
@@ -95,6 +203,11 @@ function TweetsPage({
       setError(error.message);
     }
   }
+
+  const currentPageIds = result.data.map((tweet) => tweet._id);
+  const selectedOnPage = currentPageIds.filter((id) => selectedIds.has(id));
+  const allCurrentPageSelected =
+    currentPageIds.length > 0 && selectedOnPage.length === currentPageIds.length;
 
   return (
     <section className="dashboard-grid">
@@ -121,7 +234,38 @@ function TweetsPage({
           <div className="section-heading">
             <div>
               <h2>Tweets</h2>
-              <p>{result.total} saved tweets</p>
+              <p>
+                {result.total} saved tweets
+                {selectedIds.size > 0 ? ` - ${selectedIds.size} selected` : ""}
+              </p>
+            </div>
+
+            <div className="tweet-selection-actions">
+              <label className="tweet-select-all">
+                <input
+                  type="checkbox"
+                  checked={allCurrentPageSelected}
+                  disabled={loading || currentPageIds.length === 0}
+                  onChange={(event) => handleSelectCurrentPage(event.target.checked)}
+                />
+                <span>Select page</span>
+              </label>
+
+              <button
+                type="button"
+                onClick={handleDeleteSelected}
+                disabled={loading || selectedIds.size === 0}
+              >
+                Delete selected
+              </button>
+
+              <button
+                type="button"
+                onClick={handleDeleteAll}
+                disabled={loading || result.total === 0}
+              >
+                Delete all
+              </button>
             </div>
           </div>
 
@@ -131,6 +275,8 @@ function TweetsPage({
             tweets={result.data}
             loading={loading}
             onDelete={handleDeleteTweet}
+            selectedIds={selectedIds}
+            onSelectChange={handleSelectTweet}
           />
 
           <Pagination

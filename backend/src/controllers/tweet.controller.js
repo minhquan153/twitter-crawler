@@ -30,10 +30,29 @@ async function removeTweet(req, res) {
   });
 }
 
+async function removeTweets(req, res) {
+  const result = await tweetService.deleteTweets(req.body.ids);
+
+  res.json({
+    message: "Tweets deleted",
+    ...result,
+  });
+}
+
+async function removeAllTweets(req, res) {
+  const result = await tweetService.deleteAllTweets(req.body);
+
+  res.json({
+    message: "Tweets deleted",
+    ...result,
+  });
+}
 
 module.exports = {
   listTweets,
   importTweetData,
   exportTweetData,
   removeTweet,
+  removeTweets,
+  removeAllTweets,
 };
